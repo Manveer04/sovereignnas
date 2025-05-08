@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SovereignNAS Status Terminal</title>
+  <link rel="icon" href="logo.png" />
+
+  <!-- Vanta.js and Three.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      background: #0a0f1c;
+      color: #e6fff5;
+      font-family: 'Courier New', Courier, monospace;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    #vanta-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    .terminal {
+      background: rgba(0, 8, 20, 0.6);
+      border: 2px solid #00ff9f;
+      padding: 2rem;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 1020px;
+      box-shadow: 0 0 20px rgba(0, 255, 159, 0.4);
+      margin: 1rem auto;
+      color: #f0fff5;
+      text-shadow: 0 0 2px #00ff9f55;
+      box-sizing: border-box;
+    }
+
+    .terminal:nth-of-type(2),
+    .terminal:nth-of-type(3) {
+      background: rgba(0, 17, 34, 0.6);
+      border-color: #00bfa5;
+      box-shadow: 0 0 20px rgba(0, 191, 165, 0.4);
+    }
+
+    .logo {
+      display: block;
+      width: 70px;
+      margin: 0 auto 1rem auto;
+      border-radius: 5px;
+      filter: drop-shadow(0 0 8px #00ff9f);
+    }
+
+    .main-header {
+      text-align: center;
+    }
+
+    .header {
+      text-align: center;
+      font-size: 2rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 8px #00ff9f;
+      color: #ffffff;
+    }
+
+    .status-line {
+      font-size: 1.2rem;
+      margin: 0.5rem 0;
+      color: #e6fff5;
+    }
+
+    .services-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      margin-top: 1rem;
+      font-size: 1.1rem;
+    }
+
+    .service {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.6rem 1rem;
+      background: rgba(0, 255, 159, 0.05);
+      border-radius: 6px;
+      border-left: 3px solid #00ff9f44;
+      box-shadow: 0 0 5px rgba(0, 255, 159, 0.1);
+      transition: all 0.3s ease;
+      gap: 1rem;
+    }
+
+
+    .service:hover {
+      background: rgba(0, 255, 159, 0.15);
+      transform: scale(1.02);
+    }
+
+    .service-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 4px;
+      filter: drop-shadow(0 0 4px #00ff9f88);
+    }
+
+    .service-info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      transition: all 0.3s ease;
+      height: 100%;
+    }
+
+    .service:hover .service-info {
+      justify-content: flex-start;
+    }
+
+    .label {
+      font-weight: bold;
+      color: #ffffff;
+    }
+
+    .description {
+      font-size: 0.9rem;
+      color: #99ffe2;
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .service:hover .description {
+      opacity: 1;
+      max-height: 40px;
+    }
+
+    .service-meta {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+
+    .status-badge {
+      font-size: 1.2rem;
+      font-weight: bold;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      text-shadow: 0 0 2px #000;
+    }
+
+    .status-badge.online {
+      color: #00ff9f;
+    }
+
+    .status-badge.offline {
+      color: #ff4d4d;
+    }
+
+    .creator-profile {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .creator-photo {
+      width: 175px;
+      height: 175px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 0 15px #00ff9f88;
+      border: 2px solid #00ff9f33;
+      transition: transform 0.3s ease;
+    }
+
+    .creator-photo:hover {
+      transform: scale(1.05);
+    }
+
+    .creator-text {
+      max-width: 600px;
+    }
+
+
+    .download-btn,
+    .linkedin-btn,
+    .youtube-btn {
+      display: inline-block;
+      padding: 0.6rem 1.2rem;
+      margin: 0.5rem;
+      text-decoration: none;
+      font-weight: bold;
+      border-radius: 5px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .download-btn {
+      background-color: #00ff9f;
+      color: #000814;
+      box-shadow: 0 0 10px #00ff9f88;
+    }
+
+    .linkedin-btn {
+      background-color: #0077b5;
+      color: #ffffff;
+      box-shadow: 0 0 10px #0077b588;
+    }
+
+    .youtube-btn {
+      background-color: #ff0000;
+      color: #ffffff;
+      box-shadow: 0 0 10px #ff000088;
+    }
+
+    .download-btn:hover {
+      background-color: #00bfa5;
+      color: #ffffff;
+    }
+
+    .linkedin-btn:hover {
+      background-color: #005582;
+      color: #ffffff;
+    }
+
+    .youtube-btn:hover {
+      background-color: #cc0000;
+      color: #ffffff;
+    }
+
+    footer {
+      margin-top: 2rem;
+      font-size: 0.8rem;
+      color: #b5ffe7;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="vanta-bg"></div>
+  <div class="container">
+    <div class="terminal">
+      <img src="logo.png" alt="SovereignNAS Logo" class="logo" />
+      <h1 class="main-header">
+        <span class="highlight">Project</span> SovereignNAS :
+        <span class="highlight-alt">TrueNAS Scale Monitor</span>
+      </h1>
+
+
+      <div class="server-status-box">
+        <span class="status-line">Server Status:</span>
+        <span id="main-server-status" class="status-badge online">✅ ONLINE</span>
+      </div>
+      <div class="status-line">[Last Checked] 2025-05-09 03:10 +0800</div>
+      <div class="status-line">[Monitored Services]</div>
+
+      <div class="services-grid">
+        <div class="service" title="Web UI for managing TrueNAS system.">
+          <div class="service-meta">
+            <img src="icons/truenas.png" class="service-icon" alt="TrueNAS">
+            <div class="service-info">
+              <span class="label">TrueNAS UI</span>
+              <span class="description">Storage manager and system dashboard</span>
+            </div>
+          </div>
+          <span id="status-truenas" class="status-badge online">✅</span>
+        </div>
+
+        <div class="service" title="Peer-to-peer VPN that securely connects devices.">
+          <div class="service-meta">
+            <img src="icons/tailscale.png" class="service-icon" alt="Tailscale">
+            <div class="service-info">
+              <span class="label">Tailscale</span>
+              <span class="description">Private mesh network VPN</span>
+            </div>
+          </div>
+          <span id="status-tailscale" class="status-badge online">✅</span>
+        </div>
+
+        <div class="service" title="Real-time file sync between devices.">
+          <div class="service-meta">
+            <img src="icons/syncthing.png" class="service-icon" alt="Syncthing">
+            <div class="service-info">
+              <span class="label">Syncthing</span>
+              <span class="description">Decentralized file synchronization</span>
+            </div>
+          </div>
+          <span id="status-syncthing" class="status-badge online">✅</span>
+        </div>
+
+        <div class="service" title="Smart AI-powered photo gallery.">
+          <div class="service-meta">
+            <img src="icons/photoprism.png" class="service-icon" alt="PhotoPrism">
+            <div class="service-info">
+              <span class="label">PhotoPrism</span>
+              <span class="description">AI photo library & face detection</span>
+            </div>
+          </div>
+          <span id="status-photoprism" class="status-badge online">✅</span>
+        </div>
+
+        <div class="service" title="NVR software for camera surveillance.">
+          <div class="service-meta">
+            <img src="icons/shinobi.png" class="service-icon" alt="Shinobi">
+            <div class="service-info">
+              <span class="label">Shinobi</span>
+              <span class="description">Camera monitoring and NVR control</span>
+            </div>
+          </div>
+          <span id="status-shinobi" class="status-badge offline">❌</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="terminal">
+      <div class="header">Project Background : Story & Inspiration</div>
+      <div class="status-line">
+        Born from a need to solve a real-world problem—running out of cloud storage—SovereignNAS was built from an old
+        HP Compaq dc5700 SFF with a Pentium Dual-Core E5200 CPU and 4GB RAM.
+      </div>
+      <div class="status-line">
+        Motivated by privacy, cost-efficiency, and curiosity, the project repurposed second-hand drives, used bind
+        mounts, Syncthing, and AI-powered PhotoPrism indexing to create a smart, secure family photo vault.
+      </div>
+      <div class="status-line">
+        Notable tech: TrueNAS SCALE, Tailscale VPN, Syncthing, PhotoPrism, and Shinobi NVR—all integrated via creative
+        scripting, cron jobs, and clever workarounds.
+      </div>
+      <div class="status-line">
+        It's not just a NAS—it's a resilient, evolving personal cloud designed with heart, ingenuity, and lots of
+        troubleshooting.
+      </div>
+      <div style="text-align: center; margin-top: 1.5rem;">
+        <a href="TrueNAS-Project-Story.pdf" download class="download-btn">📄 Download Documentation (PDF)</a>
+        <a href="https://www.youtube.com/watch?v=UcmBHz5QIXc" target="_blank" class="youtube-btn">🎥 Watch Video
+          (YouTube)</a>
+      </div>
+    </div>
+
+    <div class="terminal">
+      <div class="header">Creator Info : Manveer Singh</div>
+      <div class="creator-profile">
+        <img src="manveer.jpg" alt="Manveer Singh" class="creator-photo" />
+        <div class="creator-text">
+          <div class="status-line">
+            I'm a passionate tech tinkerer who turned a forgotten PC into a private, feature-rich NAS system—
+            driven by learning, family needs, and open-source power.
+          </div>
+          <div class="status-line">
+            Always exploring, building, and sharing. Feel free to connect with me professionally:
+          </div>
+          <div style="margin-top: 1rem;">
+            <a href="https://www.linkedin.com/in/manveer04/" target="_blank" class="linkedin-btn">🔗 Connect on
+              LinkedIn</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <footer>
+      ⌘ SovereignNAS | Powered by TrueNAS SCALE | Page auto-generated by custom sync script
+    </footer>
+  </div>
+
+  <!-- Vanta Background Init Script -->
+  <script>
+    VANTA.NET({
+      el: "#vanta-bg",
+      mouseControls: true,
+      touchControls: true,
+      gyroControls: false,
+      minHeight: 200.00,
+      minWidth: 200.00,
+      scale: 1.00,
+      scaleMobile: 1.00,
+      color: 0x00ff9f,
+      backgroundColor: 0x0a0f1c
+    });
+  </script>
+</body>
+
+</html>
