@@ -1,14 +1,12 @@
 # Project SovereignNAS Status Dashboard
 
-![SovereignNAS Logo](logo.png)
-
 A live status monitoring dashboard for **Project SovereignNAS** - a personal home NAS built from repurposed hardware running TrueNAS SCALE.
 
 ## 🌟 Overview
 
 This web dashboard provides real-time monitoring of the SovereignNAS infrastructure, displaying the operational status of all integrated services. The page is automatically updated every 5 minutes by a custom sync script running on the TrueNAS SCALE server.
 
-**Live Demo**: [View Dashboard](https://manveer04.github.io/sovereignnas/) *(Replace with your actual GitHub Pages URL)*
+**Live Demo**: [View Dashboard](https://manveer04.github.io/sovereignnas/)
 
 ## 🚀 Project Background
 
@@ -184,7 +182,7 @@ The dashboard is designed to work with a custom sync script running on the TrueN
 ## 📄 Documentation
 
 ### Additional Resources
-- [TrueNAS Project Story]([TrueNAS-Project-Story.pdf](https://drive.google.com/file/d/1e5qsplT6q8BjbGqeSYrbHpXhXs9uNn1n/view?usp=sharing)) - Complete project documentation
+- [TrueNAS Project Story](https://drive.google.com/file/d/1e5qsplT6q8BjbGqeSYrbHpXhXs9uNn1n/view?usp=sharing) - Complete project documentation
 - [YouTube Demo](https://www.youtube.com/watch?v=UcmBHz5QIXc) - Video walkthrough
 - [LinkedIn Profile](https://www.linkedin.com/in/manveer04/) - Creator contact
 
@@ -208,7 +206,7 @@ The dashboard is designed to work with a custom sync script running on the TrueN
 - **Automation Success**: Reliable 24/7 operation with minimal intervention
 - **Scalability**: Foundation for future home lab expansion
 
-## 📞 Contact & Support
+## 📞 Contact
 
 **Creator**: Manveer Singh  
 **LinkedIn**: [manveer04](https://www.linkedin.com/in/manveer04/)  
